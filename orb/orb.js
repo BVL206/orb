@@ -86,10 +86,12 @@ if (Meteor.isClient) {
 				ctx.drawImage(video,0,0,w,h);
 				video.play();
 				
+				try{
 				// Calc points
 				var last_pt = [];
 				for(var i=last_homo3x3.length-1; i>-1; i--)
 				{
+					if(last_homo3x3[i])
 					last_pt[i] = HtoP(last_homo3x3[i].data,320,240);
 					/*if(last_homo3x3.length - i > 4)
 					for(var p=0; p<4; p++){
@@ -145,8 +147,8 @@ if (Meteor.isClient) {
 				}*/
 				var new_pt = [];
 				for(var i=0; i<4; i++){
+					new_pt[i] = {x: 0, y: 0};
 					if(Math.sqrt(Math.pow(last_pt[0][i].x-last_pt[1][i].x,2)+Math.pow(last_pt[0][i].y-last_pt[1][i].y,2)) < 15){
-						new_pt[i] = {x: 0, y: 0};
 						var gx=0 ,gy=0;
 						for(var o=0; o<3; o++){
 							gx+=last_pt[o][i].x;
@@ -159,7 +161,7 @@ if (Meteor.isClient) {
 						new_pt[i].y = last_pt[0][i].y;
 					}
 				}
-				if(last_new_pt)
+				if(last_new_pt && new_pt.length != 0 && last_new_pt.length != 0)
 				for(var i=0; i<4; i++)
 				{
 					if(Math.sqrt(Math.pow(new_pt[i].x-last_new_pt[i].x,2)+Math.pow(new_pt[i].y-last_new_pt[i].y,2)) < 3)
@@ -170,7 +172,9 @@ if (Meteor.isClient) {
 				}
 				last_new_pt = new_pt;
 				
+				if(new_pt.length != 0)
 				render_pattern_shape(new_pt);
+				} catch (a) {}
 			}, 16);
 			//setInterval(function(){ctx.drawImage(img_preview, 0, 0, w, h);if(cur_homo3x3) render_pattern_shape(HtoP(cur_homo3x3.data,320,240));},32);
 			navigator.getUserMedia({video:true}, function(stream){
